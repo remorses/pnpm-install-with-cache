@@ -1,13 +1,19 @@
-name: 'pnpm install with cache'
-description: 'Speed up pnpm installation by caching pnpm store.'
-author: 'Covbot'
+name: "pnpm install with cache"
+description: "Speed up pnpm installation by caching pnpm store."
+author: "Covbot"
+inputs:
+    filter:
+        required: false
+        description: Filter what packages you want to install
+
 branding:
-    icon: 'box'
-    color: 'yellow'
+    icon: "box"
+    color: "yellow"
 runs:
     using: composite
     steps:
         - name: Get pnpm store directory
+
           id: pnpm-cache
           shell: bash
           run: |
@@ -17,10 +23,10 @@ runs:
           uses: actions/cache@v3
           with:
               path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-              key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+              key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ inputs.filter }}
               restore-keys: |
                   ${{ runner.os }}-pnpm-store-
 
         - name: Install dependencies
-          run: pnpm install
+          run: "pnpm install ${{ inputs.filter && ('--filter ' + inputs.filter) }}"
           shell: bash
